@@ -1042,9 +1042,6 @@ Primitive values MUST be serialized to JSON following the rules of [RFC4627][rfc
 ### 11.2 Guidelines for dates and times
 #### 11.2.1 Producing dates
 Services MUST produce dates using the `DateLiteral` format, and SHOULD use the `Iso8601Literal` format unless there are compelling reasons to do otherwise.
-Services that do use the `StructuredDateLiteral` format MUST NOT produce dates using the `T` kind unless BOTH the additional precision is REQUIRED and ECMAScript clients are explicitly unsupported.
-(Non-Normative statement: When deciding which particular `DateKind` to standardize on, the approximate order of preference is `E, C, U, W, O, X, I, T`.
-This optimizes for ECMAScript, .NET, and C++ programmers, in that order.)
 
 #### 11.2.2 Consuming dates
 Services MUST accept dates from clients that use the same `DateLiteral` format (including the `DateKind`, if applicable) that they produce, and SHOULD accept dates using any `DateLiteral` format.
@@ -1070,37 +1067,10 @@ The following is not a context-free grammar; in particular, the interpretation o
 ```
 DateLiteral:
   Iso8601Literal
-  StructuredDateLiteral
 
 Iso8601Literal:
   A string literal as defined in http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15. Note that the full grammar for ISO 8601 (such as "basic format" without separators) is not supported.
   All dates default to UTC unless specified otherwise.
-
-StructuredDateLiteral:
-  { DateKindProperty , DateValueProperty }
-  { DateValueProperty , DateKindProperty }
-
-DateKindProperty
-  "kind" : DateKind
-
-DateKind:
-  "C"            ; see below
-  "E"            ; see below
-  "I"            ; see below
-  "O"            ; see below
-  "T"            ; see below
-  "U"            ; see below
-  "W"            ; see below
-  "X"            ; see below
-
-DateValueProperty:
-  "value" : DateValue
-
-DateValue:
-  UnsignedInteger        ; not defined here
-  SignedInteger        ; not defined here
-  RealNumber        ; not defined here
-  Iso8601Literal        ; as above
 ```
 
 #### 11.3.2 Commentary on date formatting
@@ -1109,43 +1079,6 @@ Here is an example of an object with a property named `creationDate` that is set
 
 ```json
 { "creationDate" : "2015-02-13T13:15Z" }
-```
-
-The `StructuredDateLiteral` consists of a `DateKind` and an accompanying `DateValue` whose valid values (and their interpretation) depend on the `DateKind`. The following table describes the valid combinations and their meaning:
-
-DateKind | DateValue       | Colloquial Name & Interpretation                                                                                                                  | More Info
--------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------
-C        | UnsignedInteger | "CLR"; number of milliseconds since midnight January 1, 0001; negative values are not allowed. *See note below.*                                  | [MSDN][clr-time]
-E        | SignedInteger   | "ECMAScript"; number of milliseconds since midnight, January 1, 1970.                                                                             | [ECMA International][ecmascript-time]
-I        | Iso8601Literal  | "ISO 8601"; a string limited to the ECMAScript subset.                                                                                            |
-O        | RealNumber      | "OLE Date"; integral part is the number of days since midnight, December 31, 1899, and fractional part is the time within the day (0.5 = midday). | [MSDN][ole-date]
-T        | SignedInteger   | "Ticks"; number of ticks (100-nanosecond intervals) since midnight January 1, 1601. *See note below.*                                             | [MSDN][ticks-time]
-U        | SignedInteger   | "UNIX"; number of seconds since midnight, January 1, 1970.                                                                                        | [MSDN][unix-time]
-W        | SignedInteger   | "Windows"; number of milliseconds since midnight January 1, 1601. *See note below.*                                                               | [MSDN][windows-time]
-X        | RealNumber      | "Excel"; as for `O` but the year 1900 is incorrectly treated as a leap year, and day 0 is "January 0 (zero)."                                     | [Microsoft Support][excel-time]
-
-**Important note for `C` and `W` kinds:** The native CLR and Windows times are represented by 100-nanosecond "tick" values.
-To interoperate with ECMAScript clients that have limited precision, _these values MUST be converted to and from milliseconds_ when (de)serialized as a `DateLiteral`.
-One millisecond is equivalent to 10,000 ticks.
-
-**Important note for `T` kind:** This kind preserves the full fidelity of the Windows native time formats (and is trivially convertible to and from the native CLR format) but is incompatible with ECMAScript clients.
-Therefore, its use SHOULD be limited to only those scenarios that both require the additional precision and do not need to interoperate with ECMAScript clients.
-
-Here is the same example of an object with a property named creationDate that is set to February 13, 2015, at 1:15 p.m. UTC, using several formats:
-
-```json
-[
-  { "creationDate" : { "kind" : "O", "value" : 42048.55 } },
-  { "creationDate" : { "kind" : "E", "value" : 1423862100000 } }
-]
-```
-
-One of the benefits of separating the kind from the value is that once a client knows the kind used by a particular service, it can interpret the value without requiring any additional parsing.
-In the common case of the value being a number, this makes coding easier for developers:
-
-```csharp
-// We know this service always gives out ECMAScript-format dates
-var date = new Date(serverResponse.someObject.creationDate.value);
 ```
 
 ### 11.4 Durations
