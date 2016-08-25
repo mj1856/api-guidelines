@@ -106,7 +106,7 @@ This document establishes the guidelines Microsoft REST APIs SHOULD follow so RE
 		- [15.2    Feature allow list](#152-feature-allow-list)
 	- [16     Appendix](#16-appendix)
 		- [16.1    Sequence diagram notes](#161-sequence-diagram-notes)
-	
+
 
 <!-- /TOC -->
 
@@ -160,7 +160,7 @@ When a service adds a new API, that API SHOULD be consistent with the other APIs
 So if a service was written against version 1.0 of the guidelines, new APIs added incrementally to the service SHOULD also follow version 1.0. The service can then upgrade to align with the latest version of the guidelines at the service's next major release.
 
 ### 4.3 Requirements language
-The keywords "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD," "SHOULD NOT," "RECOMMENDED," "MAY," and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt). 
+The keywords "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD," "SHOULD NOT," "RECOMMENDED," "MAY," and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 ### 4.4 License
 
@@ -258,7 +258,7 @@ Here are some sources for determining what target clients support:
 
  * [http://stackoverflow.com/a/417184](http://stackoverflow.com/a/417184)
  * [https://blogs.msdn.microsoft.com/ieinternals/2014/08/13/url-length-limits/](https://blogs.msdn.microsoft.com/ieinternals/2014/08/13/url-length-limits/)
- 
+
 Also note that some technology stacks have hard and adjustable url limits, so keep this in mind as you design your services.
 
 ### 7.3 Canonical identifier
@@ -1059,7 +1059,7 @@ The Web has coalesced around the [ECMAScript subset of ISO 8601 date formats (IS
 For those cases, this document defines a JSON serialization format that can be used to unambiguously represent dates in different formats.
 Other serialization formats (such as XML) could be derived from this format.
 
-#### 11.3.1 The `DateLiteral` format 
+#### 11.3.1 The `DateLiteral` format
 Dates represented in JSON are serialized using the following grammar.
 Informally, a `DateValue` is either an ISO 8601-formatted string or a JSON object containing two properties named `kind` and `value` that together define a point in time.
 The following is not a context-free grammar; in particular, the interpretation of `DateValue` depends on the value of `DateKind`, but this minimizes the number of productions required to describe the format.
